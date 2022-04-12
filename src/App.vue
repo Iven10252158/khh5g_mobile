@@ -10,10 +10,10 @@
 export default {
   methods: {
     mobileMode () {
-      console.log('3, mobileMode')
+      // console.log('3, mobileMode')
       window.addEventListener('orientationchange', () => {
         if (window.orientation === 0) { // portrait
-          console.log('portrait')
+          // console.log('portrait')
         } else if (window.orientation === 90 || window.orientation === -90) { // landscape
           alert('請將手機轉回直式')
         }
@@ -22,10 +22,10 @@ export default {
   },
   mounted () {
     if (window.orientation === 90 || window.orientation === -90) {
-      console.log('2, if判斷式')
+      // console.log('2, if判斷式')
       alert('請將手機轉回直式')
     } else {
-      console.log('2, if判斷式 portrait')
+      // console.log('2, if判斷式 portrait')
     }
     this.mobileMode()
   }

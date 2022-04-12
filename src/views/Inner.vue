@@ -47,9 +47,7 @@ export default {
         })
       } else if (this.$route.path === '/inner/merchantDetail') {
         this.$router.go(-1)
-        // this.$router.push(history.state.back)
       }
-      // console.log(this.$route)
     }
   },
   mounted () {

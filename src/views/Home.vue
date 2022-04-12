@@ -2,7 +2,7 @@
 export default {
   methods: {
     templateAPI () {
-      this.$router.replace({ path: 'content', query: { uuid: `${process.env.VUE_APP_UUID}` } })
+      this.$router.replace({ path: '/content', query: { uuid: `${process.env.VUE_APP_UUID}` } })
     }
   },
   mounted () {

@@ -19,7 +19,7 @@
           category: 'total',
           page: 1
         }}"
-    class="merchants-btn text-decoration-none">
+    class="merchants-btn text-decoration-none" @click="getShops">
       <p class="mb-0 pe-3">
           <img class="d-block" src="~@/assets/Vector.svg" alt="">
         </p>商家
@@ -93,11 +93,11 @@ export default {
     },
     onPaused () {
       console.log('## OnPaused')
+    },
+    getShops () {
+      this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
+      console.log('getShops')
     }
-    // getShops () {
-    //   this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
-    //   console.log('getShops')
-    // }
   },
   mounted () {
     this.getPageID()
@@ -141,7 +141,6 @@ export default {
     position: absolute;
     top: 23%;
     left: 4%;
-    // background-image: url("~@/assets/輕軌_16x9.png");
     width: 92%;
     height: 68.5%;
   }

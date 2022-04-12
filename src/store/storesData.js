@@ -35,7 +35,7 @@ const mutations = {
     state.pagination = payload.slice(0, 1)
     state.stores = payload.slice(1)
   },
-  getAllTypes (state, payload, page) {
+  getAllTypes (state, payload) {
     state.stores = payload.slice(1)
     state.pagination = payload.slice(0, 1)
     state.page = state.pagination[0].page
@@ -65,22 +65,22 @@ const actions = {
         const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.type}&region=${data.region}&offset=10&page=${data.page}`)
         // console.log('try1', res)
         commit('getAllTypes', res.data)
-        return res.data
+        // return res.data
       } else if (data.type) {
         const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.type}&offset=10&page=${data.page}`)
         // console.log('try2', data, res)
         commit('getAllTypes', res.data)
-        return res.data
+        // return res.data
       } else if (data.region) {
         const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?region=${data.region}&offset=10&page=${data.page}`)
         // console.log('try3', res)
         commit('getAllTypes', res.data)
-        return res.data
+        // return res.data
       } else {
         const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?offset=10&page=${data.page}`)
         // console.log('try4', res)
         commit('getAllTypes', res.data)
-        return res.data
+        // return res.data
       }
     } catch (error) {
       console.log('catch', error)

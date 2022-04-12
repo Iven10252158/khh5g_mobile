@@ -22,25 +22,25 @@
                       <template v-for="page in paginations" :key="page.offset">
                         <li id="page-prev-function" class="page-item text-center"
                         :class="{'disabled': paginations[0].page === 1}">
-                            <a class="page-link"
-                            href="#" aria-label="Previous" @click="prevPage(paginations[0].page)">
+                            <span class="page-link"
+                              aria-label="Previous" @click="prevPage(paginations[0].page)">
                             <i class="fas fa-chevron-left"></i>
-                            </a>
+                            </span>
                         </li>
                       </template>
                         <template v-for="page in paginations" :key="page.offset">
                         <li id="page-item-function" class="page-item" v-for="i in page.total_page" :key="i" >
-                            <a class="page-link page-num"
+                            <span class="page-link page-num"
                             :class="{'page-num-active':paginations[0].page === i}"
                             @click="getAllShops('', i)"
-                            href="#">{{ i }}</a>
+                            >{{ i }}</span>
                         </li>
                         </template>
                         <template v-for="page in paginations" :key="page.offset">
                           <li id="page-next-function" class="page-item text-center" :class="{'disabled': paginations[0].page === paginations[0].total_page || paginations[0].total_page === 0}">
-                              <a class="page-link" @click="nextPage(paginations[0].page)" href="#" aria-label="Next">
+                              <span class="page-link" @click="nextPage(paginations[0].page)" aria-label="Next">
                               <i class="fas fa-chevron-right"></i>
-                              </a>
+                              </span>
                           </li>
                         </template>
                     </ul>
@@ -88,22 +88,20 @@ export default {
       isStretch: false
     }
   },
-  watch: {
-    routerPage () {
-      console.log('routerPage')
-    }
-    // $route (to, from) {
-    //   console.log('to', to)
-    //   console.log('from', from)
-    // }
-    // $route: {
-    //   handler (to, from) {
-    //     console.log('to', to)
-    //     console.log('from', from)
-    //     console.log(history)
-    //   },
-    //   immediate: true // 初始化也会触发这个handler
-    // }
+  // watch: {
+  //   routerPage () {
+  //     console.log('routerPage')
+  //   },
+  //   $route (to, from) {
+  //     console.log('to', to)
+  //     console.log('from', to)
+  //   }
+  // },
+  beforeRouteUpdate (to, from) {
+    // console.log(this.$route.query.page)
+    console.log('to', to.query.page)
+    this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: to.query.page })
+    console.log('from', from)
   },
   methods: {
     getShops () {
@@ -173,17 +171,16 @@ export default {
     }
   },
   mounted () {
-    this.getAllShops()
-    console.log('merchants page')
-    // if (this.$route.query.district === 'total' && this.$route.query.category === 'total' && this.page === 1) {
-    //   this.$store.dispatch('storesData/filterType', '')
-    //   this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
-    //   // console.log('ok', this.$route)
-    // } else if (this.TypeBtn === '' && this.page === 1) {
-    //   // console.log('else', this.$route)
-    //   this.$store.dispatch('storesData/filterType', '')
-    //   this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
-    // }
+    // this.getShops()
+    if (this.$route.query.district === 'total' && this.$route.query.category === 'total' && this.page === 1) {
+      this.$store.dispatch('storesData/filterType', '')
+      this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
+      // console.log('ok', this.$route)
+    } else if (this.TypeBtn === '' && this.page === 1) {
+      // console.log('else', this.$route)
+      this.$store.dispatch('storesData/filterType', '')
+      this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
+    }
   }
 }
 </script>
