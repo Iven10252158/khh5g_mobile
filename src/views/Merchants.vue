@@ -1,40 +1,189 @@
 <template>
-    <div class="about">
-        <div class="page-top" ref="headerH">
-            <img class="img-fluid d-block" src="~@/assets/bg.png" alt="">
-        </div>
-        <div class="btns-group" :style="{ top: headerH + 'px' }">
-            <button type="button" class="back-arrow" @click="toHome">
-                <img src="~@/assets/back.svg" alt="">
-            </button>
-        <button type="button" class="shop">商家</button>
-      </div>
+    <div class="about" :style="{ top: (  this.$store.state.headerH + 46 + 44) + 'px'}">
       <div class="content">
+        <SideMenu/>
+        <router-view></router-view>
+        <div class="type-menu" ref="typeH">
+          <TypeMenu />
+        </div>
+        <div class="shops-wrap" ref="shopsH">
+          <div class="row g-2">
+            <div class="col-6 mt-0 d-flex justify-content-center shops" v-for="store in stores" :key="store.uuid">
+              <button type="button" class="border-0" @click="detailBtn(store)">{{ store.name }}</button>
+            </div>
+          </div>
+          <div v-if="stores.length ===0" class="increase text-white">此分類目前尚無新增店家哦！</div>
+        </div>
 
-      </div>
+        <!-- pagination -->
+        <div class="pagination-bar my-3">
+                <nav class="mb-0">
+                    <ul class="pagination pagination-num d-flex justify-content-center mb-0 border-0">
+                      <template v-for="page in paginations" :key="page.offset">
+                        <li id="page-prev-function" class="page-item text-center"
+                        :class="{'disabled': paginations[0].page === 1}">
+                            <a class="page-link"
+                            href="#" aria-label="Previous" @click="prevPage(paginations[0].page)">
+                            <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                      </template>
+                        <template v-for="page in paginations" :key="page.offset">
+                        <li id="page-item-function" class="page-item" v-for="i in page.total_page" :key="i" >
+                            <a class="page-link page-num"
+                            :class="{'page-num-active':paginations[0].page === i}"
+                            @click="getAllShops('', i)"
+                            href="#">{{ i }}</a>
+                        </li>
+                        </template>
+                        <template v-for="page in paginations" :key="page.offset">
+                          <li id="page-next-function" class="page-item text-center" :class="{'disabled': paginations[0].page === paginations[0].total_page || paginations[0].total_page === 0}">
+                              <a class="page-link" @click="nextPage(paginations[0].page)" href="#" aria-label="Next">
+                              <i class="fas fa-chevron-right"></i>
+                              </a>
+                          </li>
+                        </template>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
+import TypeMenu from '@/components/TypeMenu.vue'
+import SideMenu from '@/components/SideMenu.vue'
 export default {
+  components: {
+    TypeMenu,
+    SideMenu
+  },
+  computed: {
+    stores () {
+      return this.$store.getters['storesData/storesData']
+    },
+    paginations () {
+      return this.$store.getters['storesData/pagination']
+    },
+    page () {
+      return this.$store.getters['storesData/page']
+    },
+    getMerchantValue () {
+      return this.$store.getters['storesData/merchantValue']
+    },
+    TypeBtn () {
+      return this.$store.getters['storesData/TypeBtn']
+    },
+    types () {
+      return this.$store.getters['storesData/types']
+    },
+    routerPage () {
+      return this.$route.query.page
+    }
+  },
   data () {
     return {
-      headerH: ''
+      headerH: '',
+      contentH: '',
+      isStretch: false
+    }
+  },
+  watch: {
+    routerPage () {
+      console.log('routerPage')
+    }
+    // $route (to, from) {
+    //   console.log('to', to)
+    //   console.log('from', from)
+    // }
+    // $route: {
+    //   handler (to, from) {
+    //     console.log('to', to)
+    //     console.log('from', from)
+    //     console.log(history)
+    //   },
+    //   immediate: true // 初始化也会触发这个handler
+    // }
+  },
+  methods: {
+    getShops () {
+      this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
+    },
+    detailBtn (store) {
+      this.$store.commit('storeInformation', store)
+      this.$router.push({
+        path: '/inner/merchantDetail',
+        query: {
+          uuid: `${this.$route.query.uuid}`,
+          district: `${store.region}`,
+          merchantUUID: `${store.uuid}`
+        }
+      })
+    },
+    getAllShops (item, page = 1) {
+      if (this.$route.query.district === 'total') {
+        this.$store.dispatch('storesData/getAllTypes', { region: '', type: this.TypeBtn, page: page })
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: 'total',
+            category: 'total',
+            page: page
+          }
+        })
+      } else {
+        this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, type: this.TypeBtn, page: page })
+      }
+    },
+    prevPage (remove) {
+      remove--
+      if (this.$route.query.district === 'total') {
+        this.$store.dispatch('storesData/filterType', '')
+        this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: remove })
+        // this.$router.push({
+        //   path: '/inner/merchants',
+        //   query: {
+        //     uuid: `${this.$route.query.uuid}`,
+        //     district: 'total',
+        //     category: 'total',
+        //     page: remove
+        //   }
+        // })
+      } else {
+        this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, type: this.TypeBtn, page: remove })
+      }
+    },
+    nextPage (add) {
+      add++
+      if (this.$route.query.district === 'total') {
+        this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: add })
+        // this.$router.push({
+        //   path: '/inner/merchants',
+        //   query: {
+        //     uuid: `${this.$route.query.uuid}`,
+        //     district: 'total',
+        //     category: 'total',
+        //     page: add
+        //   }
+        // })
+      } else {
+        this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, type: this.TypeBtn, page: add })
+      }
     }
   },
   mounted () {
-    this.$nextTick(() => {
-      setTimeout(() => {
-        window.onload = () => {
-          this.headerH = this.$refs.headerH.offsetHeight
-          console.log('1.', this.headerH)
-        }
-        window.addEventListener('resize', () => {
-          this.headerH = this.$refs.headerH.offsetHeight
-          console.log('2.', this.headerH)
-        })
-      }, 0)
-    })
+    this.getAllShops()
+    console.log('merchants page')
+    // if (this.$route.query.district === 'total' && this.$route.query.category === 'total' && this.page === 1) {
+    //   this.$store.dispatch('storesData/filterType', '')
+    //   this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
+    //   // console.log('ok', this.$route)
+    // } else if (this.TypeBtn === '' && this.page === 1) {
+    //   // console.log('else', this.$route)
+    //   this.$store.dispatch('storesData/filterType', '')
+    //   this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
+    // }
   }
 }
 </script>
@@ -42,58 +191,90 @@ export default {
 <style lang="scss" scoped>
 .about {
   position: relative;
-  height: 100vh;
-  // overflow: hidden;
 }
-.page-top{
-  position: fixed;
-  width: 100%;
-  background-color: #2270B0;
-
-  @media(min-width: 320px) {
-    .img-fluid{
-      margin: auto;
-    }
-  }
-}
-.btns-group{
-  position: fixed;
-  width: 100%;
-  height: 46px;
-  .back-arrow{
-    border: 0;
-    background: linear-gradient(180deg, #FFF4B3 0%, #DED07B 50.21%, #FFF4B3 100%);
-    position: absolute;
-    left: 0;
-    width: 25%;
-    height: 46px;
-    img {
-      width: 30px;
-      height: 30px;
-    }
-  }
-
-  .shop{
-    position: absolute;
-    right: 0;
-    color: #fff;
-    font-size: 24px;
-    font-weight: 700;
-    height: 46px;
-    border: 0;
-    width: 75%;
-    background: linear-gradient(180deg, #86D4FA 0%, #52A1D9 51.56%, #86D4FA 100%);
-  }
-}
-.shop {
-  border: 0;
-  width: 70%;
-  color: #fff;
-  background: linear-gradient(180deg, #86D4FA 0%, #52A1D9 51.56%, #86D4FA 100%);
+.bg-cover{
+  background-size: cover;
+  background-position: center center;
 }
 .content {
-  background-color: #fa0;
-  // height: 1000px;
-  // overflow-y: scroll;
+  background-color: #2270B0;
+  position: absolute;
+  width: 100%;
+  padding-bottom: 10px;
+
+  .type-menu{
+    margin-top: 10px;
+  }
+
+  .shops-wrap {
+    width: 90%;
+    margin: 0 auto;
+
+    .shops{
+        button{
+        background-color: #18588C;
+        color: #81CFF7;
+        border-radius: 10px;
+        margin: 10px 5px 0;
+        width: 165px;
+        font-size: 14px;
+        padding: 10px 0;
+        height: 80%;
+        @media(max-width: 375px) {
+          // width: 150px;
+          font-size: 12px;
+          margin: 10px 5px 0;
+        }
+
+        @media(max-width: 320px) {
+          // width: 140px;
+          // width: 90%;
+          font-size: 12px;
+          margin: 10px auto 0;
+        }
+      }
+    }
+  }
+}
+// .shops-wrap:nth-child(odd) {
+//     width: 90%;
+//     margin: 0 auto 10px;
+//     display: flex;
+//     flex-wrap: wrap;
+//     justify-content: center;
+
+//     .shops::after {
+//       content: '';
+//       display: block;
+//       background-color: #18588C;
+//       color: #81CFF7;
+//       border-radius: 10px;
+//       margin: 10px 5px 0;
+//       width: 165px;
+//       font-size: 14px;
+//       padding: 10px 0;
+//       height: 80%;
+//     }
+// }
+.pagination-bar{
+  width: 90%;
+  margin: auto;
+  transition: all 1s;
+  .page-link{
+    font-size: 14px;
+    color: #81CFF7;
+  }
+  .page-num{
+    color: #81CFF7;
+    margin: 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .page-num-active{
+      background-color: #FEF2B1;
+      padding: 5px 10px;
+      border-radius: 50%;
+      color: #2270B0;
+  }
 }
 </style>

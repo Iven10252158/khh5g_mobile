@@ -8,9 +8,26 @@ const routes = [
     component: Home
   },
   {
-    path: '/merchants',
-    name: 'Merchants',
-    component: () => import('@/views/Merchants.vue')
+    path: '/content',
+    name: 'Content',
+    component: () => import('@/views/Content.vue')
+  },
+  {
+    path: '/inner',
+    name: 'Inner',
+    component: () => import('@/views/Inner.vue'),
+    children: [
+      {
+        path: 'merchants',
+        name: 'Merchants',
+        component: () => import('@/views/Merchants.vue')
+      },
+      {
+        path: 'merchantDetail',
+        name: 'MerchantDetail',
+        component: () => import('@/views/MerchantDetail.vue')
+      }
+    ]
   }
 ]
 
