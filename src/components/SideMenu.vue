@@ -36,8 +36,8 @@ export default {
       this.merchantsValue = 'total'
       this.$store.dispatch('storesData/filterType', '')
       if (item === undefined) {
-        this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: page })
-        this.$router.push({ path: '/inner/merchants', query: { uuid: this.$route.query.uuid, district: 'total', category: 'total' } })
+        this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: page })
+        this.$router.push({ path: '/inner/merchants', query: { uuid: this.$route.query.uuid, district: 'total', category: 'total', page: page } })
         this.$store.dispatch('storesData/getCategories')
       }
     },
@@ -47,8 +47,8 @@ export default {
       this.$store.dispatch('storesData/filterType', '')
       this.merchantsValue = this.getMerchantValue
       console.log(this.merchantsValue)
-      this.$store.dispatch('storesData/getAllTypes', { region: item, type: '', page: page })
-      this.$router.push({ path: '/inner/merchants', query: { uuid: this.$route.query.uuid, district: `${item}`, category: 'total' } })
+      this.$store.dispatch('storesData/getAllTypes', { region: item, category: '', page: page })
+      this.$router.push({ path: '/inner/merchants', query: { uuid: this.$route.query.uuid, district: `${item}`, category: 'total', page: page } })
     }
   },
   mounted () {

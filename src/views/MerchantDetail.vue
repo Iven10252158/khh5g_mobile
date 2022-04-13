@@ -1,7 +1,7 @@
 <template>
     <div class="detail" :style="{ top: (  this.$store.state.headerH + 46 + 44) + 'px', height: innerH - (this.$store.state.headerH + 46 + 44) + 'px'}">
         <SideMenu />
-        <div class="shop-information py-3" v-for="shop in shops" :key="shop.uuid">
+        <div class="shop-information py-3" v-if="storeID === $route.query.merchantUUID">
             <p>店家名稱： {{ shop.name }} </p>
             <p>店家電話： {{ shop.telephone }} </p>
             <p>店家地址： {{ shop.address }} </p>
@@ -22,25 +22,49 @@ export default {
   data () {
     return {
       innerH: '',
-      stores: []
+      stores: [],
+      storeID: '',
+      shop: {}
     }
   },
   components: {
     SideMenu
   },
   computed: {
-    shops () {
-      return this.stores.filter(item => {
+    store () {
+      return this.$store.getters.store
+    }
+    // shops () {
+    //   return this.store.filter(item => {
+    //     if (item.uuid === this.$route.query.merchantUUID) {
+    //       return item
+    //     }
+    //   })
+    // }
+  },
+  methods: {
+    comparingUUID () {
+      this.stores.forEach(item => {
         if (item.uuid === this.$route.query.merchantUUID) {
-          return item
+          this.shop = item
+          this.storeID = item.uuid
+          console.log(this.storeID, this.shop)
         }
       })
     }
   },
   mounted () {
     this.innerH = window.innerHeight
+    this.$store.dispatch('storesData/getAllStores').then(res => {
+      this.stores = res
+      this.comparingUUID()
+      // console.log(this.stores)
+    })
+    // if (this.$route.query.merchantUUID) {
+    //   console.log('storeInformation', this.store)
+    // }
+    // this.comparingUUID()
     // console.log(window.innerHeight)
-    this.stores = this.$store.getters['storesData/storesData']
   }
 }
 

@@ -19,7 +19,7 @@ export default createStore({
     },
     storeInformation (state, store) {
       state.storeData = store
-      // console.log(store)
+      console.log(store)
     }
   },
   actions: {

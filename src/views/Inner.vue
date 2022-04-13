@@ -51,7 +51,7 @@ export default {
     }
   },
   mounted () {
-    console.log('inner')
+    // console.log('inner')
     this.$store.commit('headerH', this.$refs.headerH.clientHeight)
     const vh = window.innerHeight * 0.01
     document.documentElement.style.setProperty('--vh', `${vh}px`)

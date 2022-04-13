@@ -15,6 +15,7 @@ const routes = [
   {
     path: '/inner',
     name: 'Inner',
+    redirect: 'Content',
     component: () => import('@/views/Inner.vue'),
     children: [
       {

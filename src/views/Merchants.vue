@@ -19,23 +19,37 @@
         <div class="pagination-bar my-3">
                 <nav class="mb-0">
                     <ul class="pagination pagination-num d-flex justify-content-center mb-0 border-0">
-                      <template v-for="page in paginations" :key="page.offset">
-                        <li id="page-prev-function" class="page-item text-center"
-                        :class="{'disabled': paginations[0].page === 1}">
-                            <span class="page-link"
-                              aria-label="Previous" @click="prevPage(paginations[0].page)">
-                            <i class="fas fa-chevron-left"></i>
-                            </span>
-                        </li>
-                      </template>
+                        <!-- 前一頁箭頭 -->
                         <template v-for="page in paginations" :key="page.offset">
-                        <li id="page-item-function" class="page-item" v-for="i in page.total_page" :key="i" >
-                            <span class="page-link page-num"
-                            :class="{'page-num-active':paginations[0].page === i}"
-                            @click="getAllShops('', i)"
-                            >{{ i }}</span>
-                        </li>
+                          <li id="page-prev-function" class="page-item text-center"
+                          :class="{'disabled': paginations[0].page === 1}">
+                              <span class="page-link"
+                                aria-label="Previous" @click="prevPage(paginations[0].page)">
+                              <i class="fas fa-chevron-left"></i>
+                              </span>
+                          </li>
                         </template>
+                        <!-- 首頁
+                        <template v-for="page in paginations" :key="page.offset">
+                          <li id="page-item-function" class="page-item" v-for="i in page.total_page" :key="i" >
+                              <span v-if="i === 1" class="page-link page-num"
+                              :class="{'page-num-active':paginations[0].page === i}"
+                              @click="getAllShops('', i)"
+                              >1</span>
+                          </li>
+                        </template> -->
+
+                        <!-- 中間頁碼 -->
+                        <template v-for="page in paginations" :key="page.offset">
+                          <li id="page-item-function" class="page-item" v-for="i in page.total_page" :key="i" >
+                              <span class="page-link page-num"
+                              :class="{'page-num-active':paginations[0].page === i}"
+                              @click="getAllShops('', i)"
+                              >{{ i }}</span>
+                          </li>
+                        </template>
+
+                        <!-- 下一頁箭頭 -->
                         <template v-for="page in paginations" :key="page.offset">
                           <li id="page-next-function" class="page-item text-center" :class="{'disabled': paginations[0].page === paginations[0].total_page || paginations[0].total_page === 0}">
                               <span class="page-link" @click="nextPage(paginations[0].page)" aria-label="Next">
@@ -88,26 +102,36 @@ export default {
       isStretch: false
     }
   },
-  // watch: {
-  //   routerPage () {
-  //     console.log('routerPage')
-  //   },
-  //   $route (to, from) {
-  //     console.log('to', to)
-  //     console.log('from', to)
-  //   }
-  // },
-  beforeRouteUpdate (to, from) {
-    // console.log(this.$route.query.page)
-    console.log('to', to.query.page)
-    this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: to.query.page })
-    console.log('from', from)
+  watch: {
+    $route (to, from) {
+      // 全部商圈 && 全部類別
+      if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
+        this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: to.query.page })
+        console.log('district === total && category === total', this.$route)
+        // 全部商圈 && 其他類別
+      } else if (this.$route.query.district === 'total' && this.$route.query.category !== 'total') {
+        this.$store.dispatch('storesData/getAllTypes', { region: '', category: to.query.category, page: to.query.page })
+        // 其他商圈 && 全部類別
+      } else if (this.$route.query.district !== 'total' && this.$route.query.category === 'total') {
+        this.$store.dispatch('storesData/getAllTypes', { region: to.query.district, category: '', page: to.query.page })
+        console.log('district !== total && category === total', this.$route)
+        // 其他商圈 && 其他類別
+      } else if (this.$route.query.district !== 'total' && this.$route.query.category !== 'total') {
+        this.$store.dispatch('storesData/getAllTypes', { region: to.query.district, category: to.query.category, page: to.query.page })
+        console.log('district !== total && category !== total', this.$route)
+      } else if (!this.$route.query.category) {
+        console.log('to', to)
+        console.log('from', from)
+        console.log('$route', this.$route)
+      }
+    }
   },
   methods: {
     getShops () {
-      this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
+      this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: 1 })
     },
     detailBtn (store) {
+      console.log('detailBtn')
       this.$store.commit('storeInformation', store)
       this.$router.push({
         path: '/inner/merchantDetail',
@@ -118,9 +142,12 @@ export default {
         }
       })
     },
+    setPage (page) {
+      console.log(page)
+    },
     getAllShops (item, page = 1) {
-      if (this.$route.query.district === 'total') {
-        this.$store.dispatch('storesData/getAllTypes', { region: '', type: this.TypeBtn, page: page })
+      if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
+        // this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: page })
         this.$router.push({
           path: '/inner/merchants',
           query: {
@@ -130,57 +157,165 @@ export default {
             page: page
           }
         })
+      } else if (this.$route.query.district === 'total' && this.$route.query.category !== 'total') {
+        // this.$store.dispatch('storesData/getAllTypes', { region: '', category: this.TypeBtn, page: page })
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: 'total',
+            category: this.TypeBtn,
+            page: page
+          }
+        })
+      } else if (this.$route.query.district !== 'total' && this.$route.query.category === 'total') {
+        // this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, category: '', page: page })
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: this.getMerchantValue,
+            category: 'total',
+            page: page
+          }
+        })
       } else {
-        this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, type: this.TypeBtn, page: page })
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: this.getMerchantValue,
+            category: this.TypeBtn,
+            page: page
+          }
+        })
       }
     },
     prevPage (remove) {
       remove--
-      if (this.$route.query.district === 'total') {
+      if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
         this.$store.dispatch('storesData/filterType', '')
-        this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: remove })
-        // this.$router.push({
-        //   path: '/inner/merchants',
-        //   query: {
-        //     uuid: `${this.$route.query.uuid}`,
-        //     district: 'total',
-        //     category: 'total',
-        //     page: remove
-        //   }
-        // })
+        // this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: remove })
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: 'total',
+            category: 'total',
+            page: remove
+          }
+        })
+      } else if (this.$route.query.district === 'total' && this.$route.query.category !== 'total') {
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: 'total',
+            category: this.TypeBtn,
+            page: remove
+          }
+        })
+      } else if (this.$route.query.district !== 'total' && this.$route.query.category === 'total') {
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: this.getMerchantValue,
+            category: 'total',
+            page: remove
+          }
+        })
       } else {
-        this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, type: this.TypeBtn, page: remove })
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: this.getMerchantValue,
+            category: this.TypeBtn,
+            page: remove
+          }
+        })
+        // this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, category: this.TypeBtn, page: remove })
       }
     },
     nextPage (add) {
       add++
-      if (this.$route.query.district === 'total') {
-        this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: add })
-        // this.$router.push({
-        //   path: '/inner/merchants',
-        //   query: {
-        //     uuid: `${this.$route.query.uuid}`,
-        //     district: 'total',
-        //     category: 'total',
-        //     page: add
-        //   }
-        // })
+      if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
+        this.$store.dispatch('storesData/filterType', '')
+        // this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: remove })
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: 'total',
+            category: 'total',
+            page: add
+          }
+        })
+      } else if (this.$route.query.district === 'total' && this.$route.query.category !== 'total') {
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: 'total',
+            category: this.TypeBtn,
+            page: add
+          }
+        })
+      } else if (this.$route.query.district !== 'total' && this.$route.query.category === 'total') {
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: this.getMerchantValue,
+            category: 'total',
+            page: add
+          }
+        })
       } else {
-        this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, type: this.TypeBtn, page: add })
+        this.$router.push({
+          path: '/inner/merchants',
+          query: {
+            uuid: `${this.$route.query.uuid}`,
+            district: this.getMerchantValue,
+            category: this.TypeBtn,
+            page: add
+          }
+        })
+        console.log(123)
+        // this.$store.dispatch('storesData/getAllTypes', { region: this.getMerchantValue, category: this.TypeBtn, page: remove })
       }
     }
   },
   mounted () {
     // this.getShops()
-    if (this.$route.query.district === 'total' && this.$route.query.category === 'total' && this.page === 1) {
-      this.$store.dispatch('storesData/filterType', '')
-      this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
-      // console.log('ok', this.$route)
-    } else if (this.TypeBtn === '' && this.page === 1) {
-      // console.log('else', this.$route)
-      this.$store.dispatch('storesData/filterType', '')
-      this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
+    console.log(this.$route)
+    // 全部商圈 && 全部類別
+    if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
+      this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: this.$route.query.page })
+      console.log('mounted if', this.$route)
+      // 全部商圈 && 其他類別
+    } else if (this.$route.query.district === 'total' && this.$route.query.category !== 'total') {
+      this.$store.dispatch('storesData/getAllTypes', { region: '', category: this.$route.query.category, page: this.$route.query.page })
+      console.log('mounted else if 1', this.$route)
+      // 其他商圈 && 全部類別
+    } else if (this.$route.query.district !== 'total' && this.$route.query.category === 'total') {
+      this.$store.dispatch('storesData/getAllTypes', { region: this.$route.query.district, category: '', page: this.$route.query.page })
+      console.log('mounted else if 2', this.$route)
+      // 其他商圈 && 其他類別
+    } else {
+      this.$store.dispatch('storesData/getAllTypes', { region: this.$route.query.district, category: this.$route.query.category, page: this.$route.query.page })
+      console.log('else', this.$route)
     }
+    // if (this.$route.query.district === 'total' && this.$route.query.category === 'total' && this.page === 1) {
+    //   this.$store.dispatch('storesData/filterType', '')
+    //   this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: 1 })
+    //   // console.log('ok', this.$route)
+    // } else if (this.TypeBtn === '' && this.page === 1) {
+    //   // console.log('else', this.$route)
+    //   this.$store.dispatch('storesData/filterType', '')
+    //   this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: 1 })
+    // }
   }
 }
 </script>

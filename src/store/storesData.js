@@ -8,6 +8,7 @@ const state = {
   types: [],
   typeBtn: '',
   stores: [],
+  allShops: [],
   pagination: []
 }
 
@@ -39,12 +40,16 @@ const mutations = {
     state.stores = payload.slice(1)
     state.pagination = payload.slice(0, 1)
     state.page = state.pagination[0].page
-    console.log('state.page', state.page)
+    console.log('state.page', state.pagination)
   },
   getCategories (state, payload) {
     // console.log('getCategories', payload)
     state.categories = payload.region
     state.allTypes = payload.type
+  },
+  getTotalShops (state, shops) {
+    state.allShops = shops
+    console.log('state.allShops', state.allShops)
   }
 }
 
@@ -59,26 +64,26 @@ const actions = {
     commit('filterType', type)
   },
   async getAllTypes ({ commit }, data) {
-    // console.log('data', data)
+    console.log('data', data)
     try {
-      if (data.type && data.region) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.type}&region=${data.region}&offset=10&page=${data.page}`)
-        // console.log('try1', res)
+      if (data.category && data.region) {
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&region=${data.region}&offset=4&page=${data.page}`)
+        console.log('try1', res)
         commit('getAllTypes', res.data)
         // return res.data
-      } else if (data.type) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.type}&offset=10&page=${data.page}`)
-        // console.log('try2', data, res)
+      } else if (data.category) {
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&offset=4&page=${data.page}`)
+        console.log('try2', data, res)
         commit('getAllTypes', res.data)
         // return res.data
       } else if (data.region) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?region=${data.region}&offset=10&page=${data.page}`)
-        // console.log('try3', res)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?region=${data.region}&offset=4&page=${data.page}`)
+        console.log('try3', res)
         commit('getAllTypes', res.data)
         // return res.data
       } else {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?offset=10&page=${data.page}`)
-        // console.log('try4', res)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?offset=4&page=${data.page}`)
+        console.log('try4', res)
         commit('getAllTypes', res.data)
         // return res.data
       }
@@ -86,7 +91,13 @@ const actions = {
       console.log('catch', error)
     }
   },
-
+  getAllStores ({ commit }) {
+    return axios.get(`${process.env.VUE_APP_URL}/shop/?offset=1000&page=1`)
+      .then(res => {
+        // commit('getTotalShops', res.data)
+        return res.data
+      })
+  },
   getCategories ({ commit }) {
     return axios.get(`${process.env.VUE_APP_URL}/shop/items`)
       .then(res => {
@@ -121,6 +132,9 @@ const getters = {
   TypeBtn (state) {
     return state.typeBtn
   }
+  // allStores (state) {
+  //   return state.allShops
+  // }
 }
 
 export default {
