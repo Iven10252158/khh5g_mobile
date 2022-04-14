@@ -1218,20 +1218,20 @@ $pagination-margin-start:           -$pagination-border-width !default;
 $pagination-border-color:           #2270B0; //$gray-300 !default;
 
 $pagination-focus-color:            #2270B0; //$link-hover-color !default;
-$pagination-focus-bg:               transparent; //$gray-200 !default;
+$pagination-focus-bg:               #2270B0; //$gray-200 !default;
 $pagination-focus-box-shadow:       $input-btn-focus-box-shadow !default;
-$pagination-focus-outline:          0 !default;
+$pagination-focus-outline:          #2270B0; //0 !default;
 
-$pagination-hover-color:            #2270B0; //$link-hover-color !default;
-$pagination-hover-bg:               $gray-200 !default;
+$pagination-hover-color:            #FEF2B1; //$link-hover-color !default;
+$pagination-hover-bg:               transparent; //$gray-200 !default;
 $pagination-hover-border-color:     0; //$gray-300 !default;
 
-$pagination-active-color:           $component-active-color !default;
-$pagination-active-bg:              transparent; //$component-active-bg !default;
+$pagination-active-color:           #FEF2B1; //$component-active-color !default;
+$pagination-active-bg:              #2270B0; //$component-active-bg !default;
 $pagination-active-border-color:    #2270B0; //$pagination-active-bg !default;
 
-$pagination-disabled-color:         $gray-600 !default;
-$pagination-disabled-bg:            transparent; //$white !default;
+$pagination-disabled-color:         $gray-400 !default;
+$pagination-disabled-bg:            #2270B0; //$white !default;
 $pagination-disabled-border-color:  0; //$gray-300 !default;
 
 $pagination-transition:              color .35s ease-in-out; //color .35s ease-in-out, background-color .35s ease-in-out, border-color .35s ease-in-out, box-shadow .35s ease-in-out !default;

@@ -29,25 +29,46 @@
                               </span>
                           </li>
                         </template>
-                        <!-- 首頁
+
                         <template v-for="page in paginations" :key="page.offset">
-                          <li id="page-item-function" class="page-item" v-for="i in page.total_page" :key="i" >
-                              <span v-if="i === 1" class="page-link page-num"
-                              :class="{'page-num-active':paginations[0].page === i}"
-                              @click="getAllShops('', i)"
-                              >1</span>
+                          <li id="page-prev-function" class="page-item text-center"
+>
+                              <span class="page-link" aria-label="Previous"
+                              :class="{'page-num-active':paginations[0].page === 1}"
+                              @click="getAllShops('', 1)">
+                                1
+                              </span>
                           </li>
-                        </template> -->
+                        </template>
+
+                        <!-- 左邊顯示更多 -->
+                        <template v-for="page in paginations" :key="page.offset">
+                          <li class="isMoreRight" v-if="page.page > 2">
+                            <span>...</span>
+                          </li>
+                        </template>
 
                         <!-- 中間頁碼 -->
                         <template v-for="page in paginations" :key="page.offset">
                           <li id="page-item-function" class="page-item" v-for="i in page.total_page" :key="i" >
-                              <span class="page-link page-num"
+                              <span class="page-link page-num" v-if="i > 1 && i === page.page && i < page.total_page"
                               :class="{'page-num-active':paginations[0].page === i}"
                               @click="getAllShops('', i)"
                               >{{ i }}</span>
                           </li>
                         </template>
+
+                        <!-- 右邊顯示更多 -->
+                        <template v-for="page in paginations" :key="page.offset">
+                          <li class="isMoreRight" v-if="page.page >= 2">
+                            <span>...</span>
+                          </li>
+                        </template>
+
+                        <!-- 末頁 -->
+                          <li v-for="page in paginations" :key="page.offset">
+                            <span>{{ page.total_page }}</span>
+                          </li>
 
                         <!-- 下一頁箭頭 -->
                         <template v-for="page in paginations" :key="page.offset">
@@ -99,30 +120,33 @@ export default {
     return {
       headerH: '',
       contentH: '',
-      isStretch: false
+      isStretch: false,
+      pageNoBtnCount: 2,
+      pageSize: 3,
+      currentPage: 1
     }
   },
   watch: {
     $route (to, from) {
-      // 全部商圈 && 全部類別
-      if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
-        this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: to.query.page })
-        console.log('district === total && category === total', this.$route)
-        // 全部商圈 && 其他類別
-      } else if (this.$route.query.district === 'total' && this.$route.query.category !== 'total') {
-        this.$store.dispatch('storesData/getAllTypes', { region: '', category: to.query.category, page: to.query.page })
-        // 其他商圈 && 全部類別
-      } else if (this.$route.query.district !== 'total' && this.$route.query.category === 'total') {
-        this.$store.dispatch('storesData/getAllTypes', { region: to.query.district, category: '', page: to.query.page })
-        console.log('district !== total && category === total', this.$route)
-        // 其他商圈 && 其他類別
-      } else if (this.$route.query.district !== 'total' && this.$route.query.category !== 'total') {
-        this.$store.dispatch('storesData/getAllTypes', { region: to.query.district, category: to.query.category, page: to.query.page })
-        console.log('district !== total && category !== total', this.$route)
-      } else if (!this.$route.query.category) {
-        console.log('to', to)
-        console.log('from', from)
-        console.log('$route', this.$route)
+      if (this.$route.query.district && this.$route.query.category) {
+        // 全部商圈 && 全部類別
+        if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
+          this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: to.query.page })
+          console.log('district === total && category === total', this.$route)
+          // 全部商圈 && 其他類別
+        } else if (this.$route.query.district === 'total' && this.$route.query.category !== 'total') {
+          this.$store.dispatch('storesData/getAllTypes', { region: '', category: to.query.category, page: to.query.page })
+          // 其他商圈 && 全部類別
+        } else if (this.$route.query.district !== 'total' && this.$route.query.category === 'total') {
+          this.$store.dispatch('storesData/getAllTypes', { region: to.query.district, category: '', page: to.query.page })
+          console.log('district !== total && category === total', this.$route)
+          // 其他商圈 && 其他類別
+        } else if (this.$route.query.district !== 'total' && this.$route.query.category !== 'total') {
+          this.$store.dispatch('storesData/getAllTypes', { region: to.query.district, category: to.query.category, page: to.query.page })
+          console.log('district !== total && category !== total', this.$route)
+        }
+      } else {
+        console.log('not include')
       }
     }
   },
@@ -142,10 +166,8 @@ export default {
         }
       })
     },
-    setPage (page) {
-      console.log(page)
-    },
     getAllShops (item, page = 1) {
+      console.log(page)
       if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
         // this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: page })
         this.$router.push({
@@ -392,13 +414,9 @@ export default {
   width: 90%;
   margin: auto;
   transition: all 1s;
-  .page-link{
-    font-size: 14px;
-    color: #81CFF7;
-  }
   .page-num{
     color: #81CFF7;
-    margin: 0 10px;
+    // margin: 0 5px;
     font-size: 14px;
     font-weight: 600;
   }
@@ -409,4 +427,8 @@ export default {
       color: #2270B0;
   }
 }
+  .page-link{
+    font-size: 14px;
+    color: #81CFF7;
+  }
 </style>

@@ -67,22 +67,22 @@ const actions = {
     console.log('data', data)
     try {
       if (data.category && data.region) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&region=${data.region}&offset=4&page=${data.page}`)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&region=${data.region}&offset=2&page=${data.page}`)
         console.log('try1', res)
         commit('getAllTypes', res.data)
         // return res.data
       } else if (data.category) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&offset=4&page=${data.page}`)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&offset=2&page=${data.page}`)
         console.log('try2', data, res)
         commit('getAllTypes', res.data)
         // return res.data
       } else if (data.region) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?region=${data.region}&offset=4&page=${data.page}`)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?region=${data.region}&offset=2&page=${data.page}`)
         console.log('try3', res)
         commit('getAllTypes', res.data)
         // return res.data
       } else {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?offset=4&page=${data.page}`)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?offset=2&page=${data.page}`)
         console.log('try4', res)
         commit('getAllTypes', res.data)
         // return res.data

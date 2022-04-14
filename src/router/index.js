@@ -29,6 +29,10 @@ const routes = [
         component: () => import('@/views/MerchantDetail.vue')
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    component: () => import('@/views/NotFound.vue')
   }
 ]
 

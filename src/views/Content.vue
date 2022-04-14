@@ -2,14 +2,16 @@
   <div class="home" :class="$style.height">
     <div class="media-block">
       <div class="header-bg bg-cover">
-        <div v-show="showImage" class="header-banner bg-cover" :style="{backgroundImage:'url(' +image+ ')'}" ></div>
-        <div class="header-banner bg-cover" v-show="!showImage">
-            <YoutubeVue3 ref="youtube" :videoid="youtubeSrc" :width="width" :height="height" @ended="onEnded" @paused="onPaused" @played="onPlayed"/>
+        <div v-show="image" class="header-banner bg-cover" :style="{backgroundImage:'url(' +image+ ')'}" ></div>
+        <div class="header-banner bg-cover" v-show="youtubeSrc">
+            <YoutubeVue3 ref="youtube" :videoid="youtubeSrc" :width="width" :height="height"  @ended="onEnded" @paused="onPaused" @played="onPlayed"/>
         </div>
       </div>
     </div>
     <div class="content-bottom">
-        <div class="media-bottom"></div>
+        <div class="media-bottom">
+          <button type="button" class="rePlay" @click="replay"></button>
+        </div>
     </div>
     <router-link :to="{
       path : '/inner/merchants' ,
@@ -44,29 +46,24 @@ export default {
       default: '100%'
     }
   },
-  watch: {
-    image () {
-      if (this.image) {
-        this.showImage = true
-        this.isLoading = false
-      }
-    },
-    youtubeSrc () {
-      if (this.youtubeSrc) {
-        this.showImage = false
-        this.isLoading = false
-      }
-    }
-  },
+  // watch: {
+  //   image () {
+  //     if (this.image !== '') {
+  //       this.showImage = true
+  //     }
+  //   },
+  //   youtubeSrc () {
+  //     if (this.youtubeSrc !== '') {
+  //       this.showImage = false
+  //     }
+  //   }
+  // },
   computed: {
     youtubeSrc () {
       return this.$store.getters['ws/video']
     },
     image () {
       return this.$store.getters['ws/image']
-    },
-    page () {
-      return this.$store.getters['storesData/page']
     }
   },
   data () {
@@ -79,8 +76,6 @@ export default {
     getPageID () {
       this.$http.get(`${process.env.VUE_APP_URL}/template/${this.$route.query.uuid}`)
         .then(res => {
-          // console.log(process.env.VUE_APP_URL)
-          // console.log(res)
           connectSocket(res.data.uuid)
         })
     },
@@ -88,7 +83,6 @@ export default {
       // console.log('## OnPlayed')
     },
     onEnded () {
-      // console.log('## OnEnded')
       this.$refs.youtube.player.seekTo(0)
     },
     onPaused () {
@@ -97,6 +91,9 @@ export default {
     getShops () {
       this.$store.dispatch('storesData/getAllTypes', { region: '', type: '', page: 1 })
       console.log('getShops')
+    },
+    replay () {
+      alert('回放咕咕鐘')
     }
   },
   mounted () {
@@ -152,6 +149,7 @@ export default {
     background-position: center top;
     background-image: url('~@/assets/home-page-bottom.png');
     padding-top: 87%;
+    position: relative;
   }
   .merchants-btn{
     display: flex;
@@ -172,7 +170,15 @@ export default {
     bottom: 8%;
     @media (max-width:320px) {
       font-size: 20px;
-
     }
+  }
+  .rePlay{
+    opacity: 0;
+    position: absolute;
+    width: 55%;
+    height: 20%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
   }
 </style>
