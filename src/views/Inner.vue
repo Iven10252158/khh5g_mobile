@@ -10,11 +10,11 @@
             <button type="button" class="shop">商家</button>
         </div>
         <div class="wrap d-flex justify-content-center" :style="{ top: (  this.$store.state.headerH + 46) + 'px'}">
-            <button type="button" class="shop-menu d-flex align-items-center justify-content-start" @click="areaBtn">
-                    <img src="~@/assets/icon_menu.svg" alt="">
-                    <span class="mb-0">商圈</span>
-                    <span class="mb-0 w-50 text-end" v-if="this.$route.query.district === 'total'">OSENSE 品牌館</span>
-                    <span class="mb-0 w-50 text-end" v-if="this.$route.query.district !== 'total'">{{ this.$route.query.district }}</span>
+            <button type="button" class="shop-menu d-flex align-items-center    justify-content-start" @click="areaBtn">
+                <img src="~@/assets/icon_menu.svg">
+                <span class="mb-0">商圈</span>
+                <span class="mb-0 w-50 text-end" v-if="this.$route.query.district === 'total'">OSENSE 品牌館</span>
+                <span class="mb-0 w-50 text-end" v-if="this.$route.query.district !== 'total'">{{ this.$route.query.district }}</span>
             </button>
         </div>
         <router-view />

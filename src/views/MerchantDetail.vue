@@ -6,9 +6,6 @@
             <p>店家電話： {{ shop.telephone }} </p>
             <p>店家地址： {{ shop.address }} </p>
             <a :href="shop.OEXPOURL" target="_blank" v-if="shop.qrcode && shop.OEXPOURL.includes('oexpo')" class="gotoOexpo text-decoration-none border-0 rounded-pill py-2 px-3">進入店家攤位</a>
-            <!-- <button v-if="shop.qrcode && shop.OEXPOURL.includes('oexpo')" class="gotoOexpo border-0 rounded-pill py-2 px-3" @click="oexpoBtn(shop)">
-                進入店家攤位
-            </button> -->
             <div v-if="!shop.qrcode" class="text-white increase">
             目前尚未新增廠商攤位哦!
             </div>
@@ -34,13 +31,6 @@ export default {
     store () {
       return this.$store.getters.store
     }
-    // shops () {
-    //   return this.store.filter(item => {
-    //     if (item.uuid === this.$route.query.merchantUUID) {
-    //       return item
-    //     }
-    //   })
-    // }
   },
   methods: {
     comparingUUID () {
@@ -48,7 +38,7 @@ export default {
         if (item.uuid === this.$route.query.merchantUUID) {
           this.shop = item
           this.storeID = item.uuid
-          console.log(this.storeID, this.shop)
+          // console.log(this.storeID, this.shop)
         }
       })
     }
@@ -58,13 +48,7 @@ export default {
     this.$store.dispatch('storesData/getAllStores').then(res => {
       this.stores = res
       this.comparingUUID()
-      // console.log(this.stores)
     })
-    // if (this.$route.query.merchantUUID) {
-    //   console.log('storeInformation', this.store)
-    // }
-    // this.comparingUUID()
-    // console.log(window.innerHeight)
   }
 }
 
