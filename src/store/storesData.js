@@ -40,7 +40,7 @@ const mutations = {
     state.stores = payload.slice(1)
     state.pagination = payload.slice(0, 1)
     state.page = state.pagination[0].page
-    console.log('state.page', state.pagination)
+    // console.log('state.page', state.pagination)
   },
   getCategories (state, payload) {
     // console.log('getCategories', payload)
@@ -64,26 +64,26 @@ const actions = {
     commit('filterType', type)
   },
   async getAllTypes ({ commit }, data) {
-    console.log('data', data)
+    // console.log('data', data)
     try {
       if (data.category && data.region) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&region=${data.region}&offset=2&page=${data.page}`)
-        console.log('try1', res)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&region=${data.region}&offset=1&page=${data.page}`)
+        // console.log('try1', res)
         commit('getAllTypes', res.data)
         // return res.data
       } else if (data.category) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&offset=2&page=${data.page}`)
-        console.log('try2', data, res)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?type=${data.category}&offset=1&page=${data.page}`)
+        // console.log('try2', data, res)
         commit('getAllTypes', res.data)
         // return res.data
       } else if (data.region) {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?region=${data.region}&offset=2&page=${data.page}`)
-        console.log('try3', res)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?region=${data.region}&offset=1&page=${data.page}`)
+        // console.log('try3', res)
         commit('getAllTypes', res.data)
         // return res.data
       } else {
-        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?offset=2&page=${data.page}`)
-        console.log('try4', res)
+        const res = await axios.get(`${process.env.VUE_APP_URL}/shop/?offset=1&page=${data.page}`)
+        // console.log('try4', res)
         commit('getAllTypes', res.data)
         // return res.data
       }

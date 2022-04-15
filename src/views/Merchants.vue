@@ -16,7 +16,9 @@
         </div>
 
         <!-- pagination -->
-        <div class="pagination-bar my-3">
+        <!-- total_page > 6  -->
+        <template v-for="item in paginations" :key="item.offset">
+            <div class="pagination-bar my-3" v-if="item.total_page > 6">
                 <nav class="mb-0">
                     <ul class="pagination pagination-num d-flex justify-content-center mb-0 border-0">
                         <!-- 前一頁箭頭 -->
@@ -30,10 +32,10 @@
                           </li>
                         </template>
 
+                        <!-- 首頁 -->
                         <template v-for="page in paginations" :key="page.offset">
-                          <li id="page-prev-function" class="page-item text-center"
->
-                              <span class="page-link" aria-label="Previous"
+                          <li id="page-prev-function" class="page-item text-center">
+                              <span class="page-link page-num"
                               :class="{'page-num-active':paginations[0].page === 1}"
                               @click="getAllShops('', 1)">
                                 1
@@ -43,15 +45,28 @@
 
                         <!-- 左邊顯示更多 -->
                         <template v-for="page in paginations" :key="page.offset">
-                          <li class="isMoreRight" v-if="page.page > 2">
-                            <span>...</span>
+                          <li class="isMoreRight" v-if="page.page > 3">
+                            <span class="page-link page-num" @click="prevPage(paginations[0].page)">...</span>
                           </li>
                         </template>
 
                         <!-- 中間頁碼 -->
                         <template v-for="page in paginations" :key="page.offset">
                           <li id="page-item-function" class="page-item" v-for="i in page.total_page" :key="i" >
-                              <span class="page-link page-num" v-if="i > 1 && i === page.page && i < page.total_page"
+                            <!-- 當前頁面 < 4 顯示2、3頁 && 當前頁面 > 4 隱藏2、3頁 -->
+                            <span class="page-link page-num" v-if="i > 1 && i < 4 && page.page < 4"
+                              :class="{'page-num-active':paginations[0].page === i}"
+                              @click="getAllShops('', i)"
+                              >{{ i }}</span>
+
+                            <!-- 顯示當前頁面highlight -->
+                            <span class="page-link page-num" v-else-if="i > 1 && i === page.page && i < page.total_page"
+                              :class="{'page-num-active':paginations[0].page === i}"
+                              @click="getAllShops('', i)"
+                              >{{ i }}</span>
+
+                              <!-- 當前頁面在末頁前兩頁時，顯示最末頁前的兩頁 -->
+                              <span class="page-link page-num" v-else-if="i > page.total_page - 3  && i < page.total_page && page.page > page.total_page - 3"
                               :class="{'page-num-active':paginations[0].page === i}"
                               @click="getAllShops('', i)"
                               >{{ i }}</span>
@@ -60,28 +75,70 @@
 
                         <!-- 右邊顯示更多 -->
                         <template v-for="page in paginations" :key="page.offset">
-                          <li class="isMoreRight" v-if="page.page >= 2">
-                            <span>...</span>
+                          <li class="isMoreRight" v-if="page.page >= 1 && page.page < page.total_page - 2">
+                            <span class="page-link page-num" @click="nextPage(paginations[0].page)">...</span>
                           </li>
                         </template>
 
                         <!-- 末頁 -->
-                          <li v-for="page in paginations" :key="page.offset">
-                            <span>{{ page.total_page }}</span>
+                        <template v-for="page in paginations" :key="page.offset">
+                          <li id="page-prev-function" class="page-item text-center">
+                              <span class="page-link page-num"
+                              :class="{'page-num-active':paginations[0].page === page.total_page}"
+                              @click="getAllShops('', page.total_page)">
+                                {{ page.total_page }}
+                              </span>
                           </li>
+                        </template>
 
                         <!-- 下一頁箭頭 -->
                         <template v-for="page in paginations" :key="page.offset">
                           <li id="page-next-function" class="page-item text-center" :class="{'disabled': paginations[0].page === paginations[0].total_page || paginations[0].total_page === 0}">
-                              <span class="page-link" @click="nextPage(paginations[0].page)" aria-label="Next">
-                              <i class="fas fa-chevron-right"></i>
+                              <span class="page-link" @click="nextPage(paginations[0].page)">
+                                <i class="fas fa-chevron-right"></i>
                               </span>
                           </li>
                         </template>
                     </ul>
                 </nav>
             </div>
-        </div>
+            <!-- total_page < 6  -->
+            <div class="pagination-bar my-3" v-else>
+                <nav class="mt-4">
+                    <ul class="pagination pagination-num d-flex justify-content-center">
+                      <!-- 前一頁箭頭 -->
+                      <template v-for="page in paginations" :key="page.offset">
+                        <li id="page-prev-function" class="page-item text-center"
+                        :class="{'disabled': paginations[0].page === 1}">
+                            <span class="page-link" @click="prevPage(paginations[0].page)">
+                                <i class="fas fa-chevron-left"></i>
+                            </span>
+                        </li>
+                      </template>
+
+                      <!-- 中間頁碼 -->
+                      <template v-for="page in paginations" :key="page.offset">
+                      <li id="page-item-function" class="page-item text-center" v-for="i in page.total_page" :key="i">
+                          <span class="page-link page-num" :class="{'page-num-active':paginations[0].page === i}" @click="getAllShops('', i)">
+                            {{ i }}
+                          </span>
+                      </li>
+                      </template>
+
+                      <!-- 下一頁箭頭 -->
+                      <template v-for="page in paginations" :key="page.offset">
+                          <li id="page-next-function" class="page-item text-center"
+                          :class="{'disabled': paginations[0].page === paginations[0].total_page || paginations[0].total_page === 0}">
+                              <span class="page-link" @click="nextPage(paginations[0].page)">
+                                  <i class="fas fa-chevron-right"></i>
+                              </span>
+                          </li>
+                      </template>
+                    </ul>
+                </nav>
+            </div>
+        </template>
+      </div>
     </div>
 </template>
 
@@ -181,12 +238,13 @@ export default {
         })
       } else if (this.$route.query.district === 'total' && this.$route.query.category !== 'total') {
         // this.$store.dispatch('storesData/getAllTypes', { region: '', category: this.TypeBtn, page: page })
+        console.log('district = total && category != total')
         this.$router.push({
           path: '/inner/merchants',
           query: {
             uuid: `${this.$route.query.uuid}`,
             district: 'total',
-            category: this.TypeBtn,
+            category: this.$route.query.category,
             page: page
           }
         })
@@ -196,7 +254,7 @@ export default {
           path: '/inner/merchants',
           query: {
             uuid: `${this.$route.query.uuid}`,
-            district: this.getMerchantValue,
+            district: this.$route.query.district,
             category: 'total',
             page: page
           }
@@ -206,8 +264,8 @@ export default {
           path: '/inner/merchants',
           query: {
             uuid: `${this.$route.query.uuid}`,
-            district: this.getMerchantValue,
-            category: this.TypeBtn,
+            district: this.$route.query.district,
+            category: this.$route.query.category,
             page: page
           }
         })
@@ -233,7 +291,7 @@ export default {
           query: {
             uuid: `${this.$route.query.uuid}`,
             district: 'total',
-            category: this.TypeBtn,
+            category: this.$route.query.category,
             page: remove
           }
         })
@@ -242,7 +300,7 @@ export default {
           path: '/inner/merchants',
           query: {
             uuid: `${this.$route.query.uuid}`,
-            district: this.getMerchantValue,
+            district: this.$route.query.district,
             category: 'total',
             page: remove
           }
@@ -252,8 +310,8 @@ export default {
           path: '/inner/merchants',
           query: {
             uuid: `${this.$route.query.uuid}`,
-            district: this.getMerchantValue,
-            category: this.TypeBtn,
+            district: this.$route.query.district,
+            category: this.$route.query.category,
             page: remove
           }
         })
@@ -261,6 +319,7 @@ export default {
       }
     },
     nextPage (add) {
+      console.log(add)
       add++
       if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
         this.$store.dispatch('storesData/filterType', '')
@@ -280,7 +339,7 @@ export default {
           query: {
             uuid: `${this.$route.query.uuid}`,
             district: 'total',
-            category: this.TypeBtn,
+            category: this.$route.query.category,
             page: add
           }
         })
@@ -289,7 +348,7 @@ export default {
           path: '/inner/merchants',
           query: {
             uuid: `${this.$route.query.uuid}`,
-            district: this.getMerchantValue,
+            district: this.$route.query.district,
             category: 'total',
             page: add
           }
@@ -299,8 +358,8 @@ export default {
           path: '/inner/merchants',
           query: {
             uuid: `${this.$route.query.uuid}`,
-            district: this.getMerchantValue,
-            category: this.TypeBtn,
+            district: this.$route.query.district,
+            category: this.$route.query.category,
             page: add
           }
         })
@@ -311,7 +370,7 @@ export default {
   },
   mounted () {
     // this.getShops()
-    console.log(this.$route)
+    // console.log(this.$route)
     // 全部商圈 && 全部類別
     if (this.$route.query.district === 'total' && this.$route.query.category === 'total') {
       this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: this.$route.query.page })
@@ -329,15 +388,6 @@ export default {
       this.$store.dispatch('storesData/getAllTypes', { region: this.$route.query.district, category: this.$route.query.category, page: this.$route.query.page })
       console.log('else', this.$route)
     }
-    // if (this.$route.query.district === 'total' && this.$route.query.category === 'total' && this.page === 1) {
-    //   this.$store.dispatch('storesData/filterType', '')
-    //   this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: 1 })
-    //   // console.log('ok', this.$route)
-    // } else if (this.TypeBtn === '' && this.page === 1) {
-    //   // console.log('else', this.$route)
-    //   this.$store.dispatch('storesData/filterType', '')
-    //   this.$store.dispatch('storesData/getAllTypes', { region: '', category: '', page: 1 })
-    // }
   }
 }
 </script>
@@ -390,33 +440,14 @@ export default {
     }
   }
 }
-// .shops-wrap:nth-child(odd) {
-//     width: 90%;
-//     margin: 0 auto 10px;
-//     display: flex;
-//     flex-wrap: wrap;
-//     justify-content: center;
 
-//     .shops::after {
-//       content: '';
-//       display: block;
-//       background-color: #18588C;
-//       color: #81CFF7;
-//       border-radius: 10px;
-//       margin: 10px 5px 0;
-//       width: 165px;
-//       font-size: 14px;
-//       padding: 10px 0;
-//       height: 80%;
-//     }
-// }
 .pagination-bar{
   width: 90%;
   margin: auto;
   transition: all 1s;
   .page-num{
     color: #81CFF7;
-    // margin: 0 5px;
+    margin: 0 5px;
     font-size: 14px;
     font-weight: 600;
   }
